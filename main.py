@@ -10,7 +10,7 @@ from tqdm import tqdm
 import emoji, time
 
 def loading_bar(duration=10):
-    for i in tqdm(range(duration), desc="🚀 Cleaning in progress..."):
+    for i in tqdm(range(duration), desc="🔥Burning in progress..."):
         time.sleep(1)  # Simulating work
 
 def get_os_type():
@@ -52,11 +52,15 @@ def find_old_files(directory, days=365):
     for root, dirs, files in os.walk(directory):
         for name in files:
             filepath = Path(root) / name
-            if now - datetime.fromtimestamp(filepath.stat().st_atime) > timedelta(
-                days=days
-            ):
-                old_files.append(filepath)
+            try:
+                if now - datetime.fromtimestamp(filepath.stat().st_atime) > timedelta(
+                    days=days
+                ):
+                    old_files.append(filepath)
+            except FileNotFoundError:
+                print(f"Warning: {filepath} was not found or has been deleted.")
     return old_files
+
 
 def delete_files(files):
     """Delete files and show progress."""
@@ -77,7 +81,7 @@ def delete_files(files):
 def clean_windows():
     temp_folders = [os.environ["TEMP"], os.environ["WINDIR"] + "\\Prefetch"]
 
-    print("🧹 Cleaning Windows temp files...")
+    print("🔥Burning Windows temp files...")
     for folder in temp_folders:
         for item in Path(folder).glob("*"):
             try:
@@ -85,24 +89,24 @@ def clean_windows():
                     shutil.rmtree(item)
                 else:
                     item.unlink()
-                print(f"✅ Removed: {item}")
+                print(f"🔥Removed: {item}")
             except Exception as e:
-                print(f"❌ Could not remove {item}: {e}")
+                print(f"❌Could not remove {item}: {e}")
 
     print("🧹 Emptying Recycle Bin...")
     try:
         # Correctly use winshell to empty the Recycle Bin
         winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
-        print("✅ Recycle Bin emptied successfully!")
+        print("🔥Recycle Bin emptied successfully!")
     except Exception as e:
-        print(f"❌ Failed to empty Recycle Bin: {e}")
+        print(f"❌Failed to empty Recycle Bin: {e}")
 
 
 def clean_linux():
     temp_folders = ["/tmp", os.path.expanduser("~/.cache")]
     clean_os_specific_folders(temp_folders)
 
-    print("🧹 Cleaning Linux temp files...")
+    print("🧹 🔥Burning Linux temp files...")
     for folder in temp_folders:
         for item in Path(folder).glob("*"):
             try:
@@ -110,21 +114,21 @@ def clean_linux():
                     shutil.rmtree(item)
                 else:
                     item.unlink()
-                print(f"✅ Removed: {item}")
+                print(f"🔥Removed: {item}")
             except Exception as e:
-                print(f"❌ Could not remove {item}: {e}")
+                print(f"❌Could not remove {item}: {e}")
 
-    print("🧹 Purging old packages with apt...")
+    print("🔥Purging old packages with apt...")
     call(["sudo", "apt-get", "autoremove", "-y"])
     call(["sudo", "apt-get", "autoclean", "-y"])
-    print("✅ Old packages purged successfully!")
+    print("🔥Old packages purged successfully!")
 
 
 def clean_macos():
     temp_folders = ["/tmp", os.path.expanduser("~/.cache")]
     clean_os_specific_folders(temp_folders)
 
-    print("🧹 Cleaning macOS temp files...")
+    print("🧹 🔥Burning macOS temp files...")
     for folder in temp_folders:
         for item in Path(folder).glob("*"):
             try:
@@ -132,11 +136,11 @@ def clean_macos():
                     shutil.rmtree(item)
                 else:
                     item.unlink()
-                print(f"✅ Removed: {item}")
+                print(f"🔥Removed: {item}")
             except Exception as e:
-                print(f"❌ Could not remove {item}: {e}")
+                print(f"❌Could not remove {item}: {e}")
 
-    print("🧹 Emptying Trash...")
+    print("🔥Emptying Trash...")
     try:
         trash = os.path.expanduser("~/.Trash")
         for item in Path(trash).glob("*"):
@@ -144,9 +148,9 @@ def clean_macos():
                 shutil.rmtree(item)
             else:
                 item.unlink()
-        print("✅ Trash emptied successfully!")
+        print("🔥Trash emptied successfully!")
     except Exception as e:
-        print(f"❌ Failed to empty Trash: {e}")
+        print(f"❌Failed to empty Trash: {e}")
 
 def main():
     os_type = get_os_type()
